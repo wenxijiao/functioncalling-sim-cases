@@ -59,8 +59,10 @@ class House:
         """list all rooms in house"""
         if not self.rooms:
             print(f"{self.name} is still empty.")
+            return None
         else:
             print(f"{self.name} includes: {', '.join(self.rooms.keys())}")
+            return list(self.rooms.keys())
     
     def switch_light(self):
         """switch light on/off"""
@@ -160,4 +162,6 @@ class HouseEnvironment:
 
 if __name__ == "__main__":
     env = HouseEnvironment()
+    rooms = env.house.list_rooms()
+    print(f"Rooms in the house: {rooms}")
     env.play()
