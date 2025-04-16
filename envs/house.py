@@ -80,10 +80,6 @@ class HouseEnvironment:
 
     def __str__(self):
         return str(self.house)
-
-    def get_room(self, room_name):
-        """get room by name"""
-        return self.house.get_room(room_name)
     
     def draw(self):
         """draw house environment"""
@@ -97,36 +93,29 @@ class HouseEnvironment:
                 item_text = font.render(f"- {item}", True, (0, 0, 0))
                 self.screen.blit(item_text, (60 + i * 200, 80 + j * 20))
 
-    def play(self):
+    def play(self, shared_state_lock):
         """start the game"""
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    env.running = False
+                    self.running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        env.running = False
-                    if event.key == pygame.K_SPACE:
-                        self.switch_light()
-                    if event.key == pygame.K_l:
-                        self.house.list_rooms()
-                    if event.key == pygame.K_a:
-                        room_name = input("Enter room name: ")
-                        item_name = input("Enter item name: ")
-                        self.add_item(room_name, item_name)
-                    if event.key == pygame.K_r:
-                        room_name = input("Enter room name: ")
-                        item_name = input("Enter item name: ")
-                        self.remove_item(room_name, item_name)
+                        self.running = False
             
-            if self.house.light:
-                env.screen.fill((255, 255, 255))
-            else:
-                env.screen.fill((0, 0, 0))
-            env.draw()
+            with shared_state_lock:
+                if self.house.light:
+                    self.screen.fill((255, 255, 255))
+                else:
+                    self.screen.fill((0, 0, 0))
+                self.draw()
             pygame.display.flip()
-            env.clock.tick(60)
+            self.clock.tick(30)
         pygame.quit()
+
+    def get_room(self, room_name):
+        """get room by name"""
+        return self.house.get_room(room_name)
 
     def add_room(self, room):
         """add room to house"""
